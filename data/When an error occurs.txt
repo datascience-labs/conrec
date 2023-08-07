@@ -1,0 +1,2 @@
+If there is an error, please copy the file from the original pkl of the data folder to the data folder.
+Instead, the user data is initialized.
