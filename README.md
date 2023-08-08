@@ -25,5 +25,9 @@ Swimming in the vast sea of online lectures
   > streamlit run app.py
 ```
 
+Or
+
+
+[![Open Live Demo in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://conrec.streamlit.app/)
+
 ## References
-S
