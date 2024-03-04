@@ -1,3 +1,11 @@
+---
+layout: project
+title: conrec/
+project: conrec
+repo: datascience-labs/conrec
+permalink: /:path/:basename:output_ext
+---
+
 # CONREC: Continuous Recommendation of Online Learning Videos Based on Concept Maps
 Swimming in the vast sea of online lectures
 ---
