@@ -11,7 +11,7 @@ class Script_Exctractor:
         self.vid = vid
         self.scriptData:list = []
         self.setTime = setTime
-        self.wikiUserKey = "ecnkjsfhuuvmjfxdvdziepjwznhwdc"
+        self.wikiUserKey = "dgvbwjfonhpzjpdjjkzpgefbiifvfz"
         self.NUM_OF_WORDS = NUM_OF_WORDS
 
     # youtube script extraction
