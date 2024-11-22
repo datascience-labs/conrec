@@ -186,6 +186,7 @@ def search_youtubes(query, video_count):
         video_response = video_request.execute()
         duration = video_response['items'][0]['contentDetails']['duration']
         duration = duration_to_minutes(duration)
+        print(duration)
         if(duration>9 and duration<120): # Storing videos with a duration of over 9 minutes and under 120 minutes
             name = item['snippet']['title']
             url = PREFIX_YOUTUBE_URL + item['id']['videoId']
@@ -257,11 +258,12 @@ def visualize_dynamic_network():
             got_net.add_node(con, label=con, title=con, color=node_color, size=node_size)
             got_net.add_edge(vid, con, value=1, label=edge_label)
 
-        got_net.show("./data/gameofthrones.html")
+        got_net.show("./data/concept_net.html")
 
-        with open("./data/gameofthrones.html", "r") as f:
+        with open("./data/concept_net.html", "r") as f:
             graph_html = f.read()
         st.components.v1.html(graph_html,width=1200, height=800) 
+
 
 # Function to draw concept circles.
 def extract_concepts(selected_video):
@@ -277,42 +279,44 @@ def extract_concepts(selected_video):
             st.markdown(f"<h5>(segment {seg_no}) {start_segment.strftime('%H:%M:%S')} - {end_segment.strftime('%H:%M:%S')}</h5>", unsafe_allow_html=True)
 
             cols = st.columns(len(segment_data))
-            
+
             # Display concepts with buttons
             for index, row in segment_data.iterrows():
                 title = row['title']
                 understand = row['understand']
+                button_key = f"{selected_video.name}_{seg_no}_{index}"
 
-                # Button style based on understand column
-                if understand == 0:
-                    button_style = "black"
-                else:
-                    button_style = "red"
+                # Initialize session state for each concept button
+                if button_key not in st.session_state:
+                    st.session_state[button_key] = understand
 
+                # Update session state based on the current value
                 with cols[index % len(segment_data)]:
-                    # Button click event
-                    if st.button(f":{button_style}[{title}]", key=f"{selected_video.name}_{seg_no}_{index}", help=f"{seg_no}_{index}"):
-                        # Toggle 'understand' value when the button is clicked
-                        understand = selected_video.segment.at[index, 'understand']
+                    # Button click event for toggling understanding
+                    if st.button(f"Toggle: {title}", key=f"toggle_{button_key}"):
+                        st.session_state[button_key] = 1 if st.session_state[button_key] == 0 else 0
 
-                        if understand == 0:
-                            clicked_word_url = row['url']
-                            # Update 'understand' to 1 for all rows with the same URL
-                            selected_video.segment.loc[selected_video.segment['url'] == clicked_word_url, 'understand'] = 1
-                        else:
-                            clicked_word_url = row['url']
-                            # Update 'understand' to 0 for all rows with the same URL
-                            selected_video.segment.loc[selected_video.segment['url'] == clicked_word_url, 'understand'] = 0
-                        
-                        for idx,video in enumerate(watchedVideo):
-                            if(video.name==selected_video.name):
-                                watchedVideo[idx]=selected_video
+                        # Update the selected_video segment based on the new state
+                        clicked_word_url = row['url']
+                        new_understand_value = st.session_state[button_key]
+                        selected_video.segment.loc[selected_video.segment['url'] == clicked_word_url, 'understand'] = new_understand_value
+
+                        # Update watchedVideo list with the modified selected_video
+                        for idx, video in enumerate(watchedVideo):
+                            if video.name == selected_video.name:
+                                watchedVideo[idx] = selected_video
                                 with open("./data/watchedVideo.pkl", "wb") as file:
                                     pickle.dump(watchedVideo, file)
                                 with open("./data/selected_video.pkl", "wb") as file:
                                     pickle.dump(selected_video, file)
-                        
-                        make_csv() # Save DataFrame to a CSV file
+
+                        make_csv()  # Save DataFrame to a CSV file
+                        st.rerun()  # Refresh the UI to reflect changes
+
+                    # Display concept with updated color based on understanding status
+                    button_color = "red" if st.session_state[button_key] == 1 else "black"
+                    st.markdown(f"<p style='color:{button_color};'>{title}</p>", unsafe_allow_html=True)
+
     else:
         st.write("No segment information available for the selected video.")
 

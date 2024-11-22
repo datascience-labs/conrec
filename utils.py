@@ -4,3 +4,4 @@ def truncate_text(text, max_length=500):
     else:
         truncated_text = text
     return truncated_text
+
